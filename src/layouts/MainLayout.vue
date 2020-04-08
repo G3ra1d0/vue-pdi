@@ -63,7 +63,7 @@
 
             <q-separator />
 
-            <q-item clickable v-ripple>
+            <q-item clickable v-ripple @click="filtroPotencia">
               <q-item-section>
                 <q-item-label>Potencia</q-item-label>
                 <q-item-label caption
@@ -126,6 +126,22 @@ export default {
       let img = new Image();
       img.src = this.base64;
       this.context.drawImage(img, 0, 0, this.largura, this.altura);
+    },
+    filtroPotencia() {
+      this.resertImagem();
+      let gama = prompt("Digite o Valor de Gama");
+      if (gama != null || gama != "") {
+        gama = parseFloat(gama);
+        let ImageData = this.getImageData();
+        for (let i = 0; i < ImageData.data.length; i += 4) {
+          ImageData.data[i] = Math.pow( ( ImageData.data[i]) / 255, gama) * 256;
+          ImageData.data[i + 1] = Math.pow( ( ImageData.data[i + 1]) / 255, gama) * 256;
+          ImageData.data[i + 2] = Math.pow( ( ImageData.data[i + 2]) / 255, gama) * 256;
+        }
+        this.putImageData(ImageData);
+      } else {
+        alert("Desculpe gama formato incorreto!");
+      }
     },
     filtroLogInverso() {
       this.resertImagem();
