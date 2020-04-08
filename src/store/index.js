@@ -2,6 +2,8 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 
 // import example from './module-example'
+import canvas from './Canvas'
+import file from './File'
 
 Vue.use(Vuex)
 
@@ -18,6 +20,7 @@ export default function (/* { ssrContext } */) {
   const Store = new Vuex.Store({
     modules: {
       // example
+      canvas, file
     },
 
     // enable strict mode (adds overhead!)
