@@ -64,7 +64,6 @@ export default {
       this.pixelY = "";
       this.pixelCor = `RGB()`;
     },
-
     hover(e) {
       e.preventDefault();
       e.stopPropagation();
