@@ -4,10 +4,6 @@
       <!-- <canvas @mousemove="hover" :height="file.height" id="IdCanvas"></canvas> -->
       <VueCanvas />
     </div>
-    <div class="col-12">
-      <q-btn @click="log" color="white" text-color="black" label="Log" />
-      <q-btn @click="invLog" color="white" text-color="black" label="Inv Log" />
-    </div>
   </q-page>
 </template>
 
