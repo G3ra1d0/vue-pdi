@@ -34,7 +34,7 @@
           header-class="text-primary"
         >
           <q-list>
-            <q-item clickable v-ripple>
+            <q-item clickable v-ripple @click="filtroNegativo">
               <q-item-section>
                 <q-item-label>Negativo</q-item-label>
                 <q-item-label caption
@@ -43,7 +43,7 @@
               </q-item-section>
             </q-item>
 
-            <q-item clickable v-ripple>
+            <q-item clickable v-ripple @click="filtroLog">
               <q-item-section>
                 <q-item-label>Logaritmo</q-item-label>
                 <q-item-label caption
@@ -102,6 +102,66 @@ export default {
     return {
       leftDrawerOpen: false
     };
+  },
+  computed: {
+    context() {
+      return this.$store.getters["canvas/getContext"];
+    },
+    base64() {
+      return this.$store.getters["file/getBase64"];
+    },
+    largura() {
+      return this.$store.getters["canvas/getLargura"];
+    },
+    altura() {
+      return this.$store.getters["canvas/getAltura"];
+    }
+  },
+  methods: {
+    limpar() {
+      this.context.clearRect(0, 0, this.largura, this.altura);
+    },
+    resertImagem() {
+      this.limpar();
+      let img = new Image();
+      img.src = this.base64;
+      this.context.drawImage(img, 0, 0, this.largura, this.altura);
+    },
+    filtroLog() {
+      this.resertImagem();
+      let ImageData = this.getImageData();
+      for (let i = 0; i < ImageData.data.length; i += 4) {
+        ImageData.data[i] = 105.886 * Math.log10(1 + ImageData.data[i]);
+        ImageData.data[i + 1] = 105.886 * Math.log10(1 + ImageData.data[i + 1]);
+        ImageData.data[i + 2] = 105.886 * Math.log10(1 + ImageData.data[i + 2]);
+        ImageData.data[i + 3] = 255;
+      }
+
+      this.putImageData(ImageData);
+    },
+    filtroNegativo() {
+      this.resertImagem();
+      let ImageData = this.getImageData();
+      for (let i = 0; i < ImageData.data.length; i += 4) {
+        ImageData.data[i] = 255 - ImageData.data[i];
+        ImageData.data[i + 1] = 255 - ImageData.data[i + 1];
+        ImageData.data[i + 2] = 255 - ImageData.data[i + 2];
+        ImageData.data[i + 3] = 255;
+      }
+      this.putImageData(ImageData);
+    },
+    putImageData(img) {
+      // Atualiza imagem
+      this.context.putImageData(img, 0, 0);
+    },
+    getImageData() {
+      // Pixel da imagem
+      // red=imgData.data[0];
+      // green=imgData.data[1];
+      // blue=imgData.data[2];
+      // alpha=imgData.data[3];
+      return this.context.getImageData(0, 0, this.largura, this.altura);
+    }
   }
 };
 </script>
