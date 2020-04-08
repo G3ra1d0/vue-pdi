@@ -52,7 +52,7 @@
               </q-item-section>
             </q-item>
 
-            <q-item clickable v-ripple>
+            <q-item clickable v-ripple @click="filtroLogInverso">
               <q-item-section>
                 <q-item-label>Logaritmo Inverso</q-item-label>
                 <q-item-label caption
@@ -127,6 +127,16 @@ export default {
       img.src = this.base64;
       this.context.drawImage(img, 0, 0, this.largura, this.altura);
     },
+    filtroLogInverso() {
+      this.resertImagem();
+      let ImageData = this.getImageData();
+      for (let i = 0; i < ImageData.data.length; i += 4) {
+        ImageData.data[i] = Math.pow(10, ImageData.data[i] / 105.886);
+        ImageData.data[i + 1] = Math.pow(10, ImageData.data[i + 1] / 105.886);
+        ImageData.data[i + 2] = Math.pow(10, ImageData.data[i + 2] / 105.886);
+      }
+      this.putImageData(ImageData);
+    },
     filtroLog() {
       this.resertImagem();
       let ImageData = this.getImageData();
@@ -134,7 +144,6 @@ export default {
         ImageData.data[i] = 105.886 * Math.log10(1 + ImageData.data[i]);
         ImageData.data[i + 1] = 105.886 * Math.log10(1 + ImageData.data[i + 1]);
         ImageData.data[i + 2] = 105.886 * Math.log10(1 + ImageData.data[i + 2]);
-        ImageData.data[i + 3] = 255;
       }
 
       this.putImageData(ImageData);
