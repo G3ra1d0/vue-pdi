@@ -30,7 +30,6 @@
           group="somegroup"
           icon="photo_filter"
           label="Filtros"
-          default-opened
           header-class="text-primary"
         >
           <q-list>
@@ -83,6 +82,27 @@
         </q-expansion-item>
         <q-separator />
       </q-list>
+      <q-expansion-item
+        group="somegroup"
+        icon="add"
+        label="Ampliar"
+        header-class="text-primary"
+      >
+        <q-list>
+          <q-item clickable v-ripple @click="ampliarNNR">
+            <q-item-section>
+              <q-item-label>Nearest Neighbor Resampling</q-item-label>
+              <q-item-label caption>Ampliar imagem</q-item-label>
+            </q-item-section>
+          </q-item>
+          <q-item clickable v-ripple @click="ampliarBIR">
+            <q-item-section>
+              <q-item-label>Bilinear Interpolation Resampling</q-item-label>
+              <q-item-label caption>Ampliar imagem</q-item-label>
+            </q-item-section>
+          </q-item>
+        </q-list>
+      </q-expansion-item>
     </q-drawer>
 
     <q-page-container>
@@ -118,6 +138,8 @@ export default {
     }
   },
   methods: {
+    ampliarBIR() {},
+    ampliarNNR() {},
     limpar() {
       this.context.clearRect(0, 0, this.largura, this.altura);
     },
