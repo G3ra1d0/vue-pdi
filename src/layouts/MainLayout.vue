@@ -138,7 +138,61 @@ export default {
     }
   },
   methods: {
-    ampliarBIR() {},
+    ampliarBIR() {
+      this.resertImagem();
+      let ImageDataOriginal = this.getImageData();
+
+      let ImageDataCopia = new ImageData(this.altura * 2, this.largura * 2);
+
+      let pixel,
+        proximoPixel = new Array(),
+        posicao = 0,
+        tamanhoLinha = this.largura * 2 * 4;
+      for (let y = 0; y < this.altura; y++) {
+        for (let x = 0; x < this.largura; x++) {
+          pixel = this.context.getImageData(x, y, 2, 2).data;
+          // console.log(x, ",", y, ":", pixel;
+          // original
+          ImageDataCopia.data[posicao] = pixel[0];
+          ImageDataCopia.data[posicao + 1] = pixel[1];
+          ImageDataCopia.data[posicao + 2] = pixel[2];
+          ImageDataCopia.data[posicao + 3] = 255;
+          // direito
+          ImageDataCopia.data[posicao + 4] = (pixel[0] + pixel[4]) / 2;
+          ImageDataCopia.data[posicao + 5] = (pixel[1] + pixel[5]) / 2;
+          ImageDataCopia.data[posicao + 6] = (pixel[2] + pixel[6]) / 2;
+          ImageDataCopia.data[posicao + 7] = 255;
+          // embaixo
+          ImageDataCopia.data[tamanhoLinha + posicao] =
+            (pixel[0] + pixel[8]) / 2;
+          ImageDataCopia.data[tamanhoLinha + posicao + 1] =
+            (pixel[0] + pixel[9]) / 2;
+          ImageDataCopia.data[tamanhoLinha + posicao + 2] =
+            (pixel[0] + pixel[10]) / 2;
+          ImageDataCopia.data[tamanhoLinha + posicao + 3] = 255;
+          // embaixo lado
+          ImageDataCopia.data[tamanhoLinha + posicao + 4] =
+            (pixel[0] + pixel[12]) / 2;
+          ImageDataCopia.data[tamanhoLinha + posicao + 5] =
+            (pixel[1] + pixel[13]) / 2;
+          ImageDataCopia.data[tamanhoLinha + posicao + 6] =
+            (pixel[2] + pixel[14]) / 2;
+          ImageDataCopia.data[tamanhoLinha + posicao + 7] = 255;
+
+          posicao += 8;
+        }
+        posicao += tamanhoLinha;
+      }
+      this.$store.dispatch("canvas/setCanvasTamanho", {
+        width: this.largura * 2,
+        height: this.altura * 2
+      });
+      setTimeout(() => {
+        console.log(ImageDataOriginal);
+        console.log(ImageDataCopia);
+        this.putImageData(ImageDataCopia);
+      }, 1000);
+    },
     ampliarNNR() {
       this.resertImagem();
       let ImageDataOriginal = this.getImageData();
