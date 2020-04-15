@@ -208,9 +208,17 @@ export default {
       leftDrawerOpen: false,
       ImageData1: "",
       ImageData2: "",
-      porcetagemImage1: 100,
-      porcetagemImage2: 100
+      porcetagemImage1: 50,
+      porcetagemImage2: 50
     };
+  },
+  watch: {
+    porcetagemImage1() {
+      this.porcetagemImage2 = 100 - this.porcetagemImage1;
+    },
+    porcetagemImage2() {
+      this.porcetagemImage1 = 100 - this.porcetagemImage2;
+    }
   },
   computed: {
     context() {
@@ -233,18 +241,15 @@ export default {
         let red, blue, green, alpha;
         for (let i = 0; i < ImageData.data.length; i += 4) {
           red =
-            (ImageData.data[i] * (this.porcetagemImage1 / 100) +
-              this.ImageData2.data[i] * (this.porcetagemImage1 / 100)) /
-            2;
+            ImageData.data[i] * (this.porcetagemImage1 / 100) +
+            this.ImageData2.data[i] * (this.porcetagemImage1 / 100);
           green =
-            (ImageData.data[i + 1] * (this.porcetagemImage1 / 100) +
-              this.ImageData2.data[i + 1] * (this.porcetagemImage1 / 100)) /
-            2;
+            ImageData.data[i + 1] * (this.porcetagemImage1 / 100) +
+            this.ImageData2.data[i + 1] * (this.porcetagemImage1 / 100);
 
           blue =
-            (ImageData.data[i + 2] * (this.porcetagemImage1 / 100) +
-              this.ImageData2.data[i + 2] * (this.porcetagemImage1 / 100)) /
-            2;
+            ImageData.data[i + 2] * (this.porcetagemImage1 / 100) +
+            this.ImageData2.data[i + 2] * (this.porcetagemImage1 / 100);
 
           ImageData.data[i] = red;
           ImageData.data[i + 1] = green;
