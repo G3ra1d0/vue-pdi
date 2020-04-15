@@ -148,7 +148,7 @@
           <div class="col-5">
             <q-input
               label="Imagem 1"
-              v-model.number="model"
+              v-model.number="porcetagemImage1"
               type="number"
               outlined
             />
@@ -156,7 +156,7 @@
           <div class="col-5">
             <q-input
               label="Imagem 2"
-              v-model.number="model"
+              v-model.number="porcetagemImage2"
               type="number"
               outlined
             />
@@ -168,6 +168,14 @@
               color="primary"
               @click="upload2Imagem"
             ></q-btn>
+            <q-btn
+              class="q-ma-sm"
+              round
+              color="primary"
+              icon="done"
+              @click="somaImagem"
+            />
+
             <input
               ref="file"
               class="hidden"
@@ -197,7 +205,11 @@ export default {
   },
   data() {
     return {
-      leftDrawerOpen: false
+      leftDrawerOpen: false,
+      ImageData1: "",
+      ImageData2: "",
+      porcetagemImage1: 100,
+      porcetagemImage2: 100
     };
   },
   computed: {
@@ -215,8 +227,35 @@ export default {
     }
   },
   methods: {
+    somaImagem() {
+      this.resertImagem().then(result => {
+        let ImageData = this.getImageData();
+        let red, blue, green, alpha;
+        for (let i = 0; i < ImageData.data.length; i += 4) {
+          red =
+            (ImageData.data[i] * (this.porcetagemImage1 / 100) +
+              this.ImageData2.data[i] * (this.porcetagemImage1 / 100)) /
+            2;
+          green =
+            (ImageData.data[i + 1] * (this.porcetagemImage1 / 100) +
+              this.ImageData2.data[i + 1] * (this.porcetagemImage1 / 100)) /
+            2;
+
+          blue =
+            (ImageData.data[i + 2] * (this.porcetagemImage1 / 100) +
+              this.ImageData2.data[i + 2] * (this.porcetagemImage1 / 100)) /
+            2;
+
+          ImageData.data[i] = red;
+          ImageData.data[i + 1] = green;
+          ImageData.data[i + 2] = blue;
+          ImageData.data[i + 3] = 255;
+        }
+        this.putImageData(ImageData);
+      });
+    },
     onFileChanged(event) {
-      let ImageData1 = this.getImageData();
+      this.ImageData1 = this.getImageData();
 
       let file = event.target.files[0];
       let reader = new FileReader();
@@ -229,22 +268,23 @@ export default {
 
         img.onload = async () => {
           await this.context.drawImage(img, 0, 0, img.width, img.height);
-          let ImageData2 = this.getImageData();
+          this.ImageData2 = this.getImageData();
 
           await this.$store.dispatch("canvas/setCanvasTamanho", {
             width: this.largura * 2 + 10,
             height: this.altura
           });
 
-          this.context.putImageData(ImageData1, 0, 0);
-          this.context.putImageData(ImageData2, this.largura / 2 + 10, 0);
-          // this.context.putImageData(ImageData2, 0, 0);
+          this.context.putImageData(this.ImageData1, 0, 0);
+          this.context.putImageData(this.ImageData2, this.largura / 2 + 10, 0);
         };
       };
     },
     upload2Imagem() {
-      this.$refs.file.value = null;
-      this.$refs.file.click();
+      this.resertImagem().then(result => {
+        this.$refs.file.value = null;
+        this.$refs.file.click();
+      });
     },
     BIR() {
       let ImageDataOriginal = this.getImageData();
