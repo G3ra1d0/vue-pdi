@@ -286,10 +286,16 @@ export default {
       };
     },
     upload2Imagem() {
-      this.resertImagem().then(result => {
-        this.$refs.file.value = null;
-        this.$refs.file.click();
-      });
+      this.resertImagem()
+        .then(result => {
+          this.$refs.file.value = null;
+          this.$refs.file.click();
+        })
+        .catch(error => {
+          alert(
+            "Por favor,Envia a primeira imagem botão + no menu superior no lado direito. Obrigado :)"
+          );
+        });
     },
     BIR() {
       let ImageDataOriginal = this.getImageData();
