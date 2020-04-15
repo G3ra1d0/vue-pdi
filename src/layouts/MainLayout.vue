@@ -25,7 +25,7 @@
       bordered
       content-class="bg-grey-1"
     >
-      <q-list bordered>
+      <q-list>
         <q-expansion-item
           group="somegroup"
           icon="photo_filter"
@@ -84,7 +84,6 @@
       </q-list>
 
       <q-expansion-item
-        default-opened
         expand-separator
         icon="add"
         label="Ampliar"
@@ -92,7 +91,6 @@
       >
         <q-expansion-item
           expand-separator
-          default-opened
           label="Pixel Vizinho"
           caption="Utilizando algoritmo Nearest Neighbor Resampling"
           header-class="text-primary"
@@ -113,7 +111,6 @@
           </div>
         </q-expansion-item>
         <q-expansion-item
-          default-opened
           expand-separator
           label="Interpolação Bilinear"
           caption="Utilizando algoritmo Bilinear Interpolation Resampling"
@@ -134,6 +131,54 @@
             />
           </div>
         </q-expansion-item>
+        <q-separator />
+      </q-expansion-item>
+
+      <q-expansion-item
+        default-opened
+        expand-separator
+        icon="perm_media"
+        label="Somar duas Imagem"
+        header-class="text-primary"
+      >
+        <div class="row justify-around text-center">
+          <div class="col-12 text-overline">
+            Informe a Porcentagem:
+          </div>
+          <div class="col-5">
+            <q-input
+              label="Imagem 1"
+              v-model.number="model"
+              type="number"
+              outlined
+            />
+          </div>
+          <div class="col-5">
+            <q-input
+              label="Imagem 2"
+              v-model.number="model"
+              type="number"
+              outlined
+            />
+          </div>
+          <div class="col-12 q-pa-sm">
+            <q-btn
+              flat
+              label="Upload 2 Imagem"
+              color="primary"
+              @click="upload2Imagem"
+            ></q-btn>
+            <input
+              ref="file"
+              class="hidden"
+              type="file"
+              multiple="multiple"
+              accept="image/*"
+              @change="onFileChanged"
+            />
+          </div>
+        </div>
+        <q-separator />
       </q-expansion-item>
     </q-drawer>
 
@@ -170,6 +215,37 @@ export default {
     }
   },
   methods: {
+    onFileChanged(event) {
+      let ImageData1 = this.getImageData();
+
+      let file = event.target.files[0];
+      let reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onloadend = () => {
+        let img = new Image();
+        img.src = reader.result;
+
+        this.context.clearRect(0, 0, this.largura, this.altura);
+
+        img.onload = async () => {
+          await this.context.drawImage(img, 0, 0, img.width, img.height);
+          let ImageData2 = this.getImageData();
+
+          await this.$store.dispatch("canvas/setCanvasTamanho", {
+            width: this.largura * 2 + 10,
+            height: this.altura
+          });
+
+          this.context.putImageData(ImageData1, 0, 0);
+          this.context.putImageData(ImageData2, this.largura / 2 + 10, 0);
+          // this.context.putImageData(ImageData2, 0, 0);
+        };
+      };
+    },
+    upload2Imagem() {
+      this.$refs.file.value = null;
+      this.$refs.file.click();
+    },
     BIR() {
       let ImageDataOriginal = this.getImageData();
 
