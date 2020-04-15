@@ -25,7 +25,7 @@
       bordered
       content-class="bg-grey-1"
     >
-      <q-list bordered>
+      <q-list>
         <q-expansion-item
           group="somegroup"
           icon="photo_filter"
@@ -84,7 +84,6 @@
       </q-list>
 
       <q-expansion-item
-        default-opened
         expand-separator
         icon="add"
         label="Ampliar"
@@ -92,7 +91,6 @@
       >
         <q-expansion-item
           expand-separator
-          default-opened
           label="Pixel Vizinho"
           caption="Utilizando algoritmo Nearest Neighbor Resampling"
           header-class="text-primary"
@@ -113,7 +111,6 @@
           </div>
         </q-expansion-item>
         <q-expansion-item
-          default-opened
           expand-separator
           label="Interpolação Bilinear"
           caption="Utilizando algoritmo Bilinear Interpolation Resampling"
@@ -134,6 +131,62 @@
             />
           </div>
         </q-expansion-item>
+        <q-separator />
+      </q-expansion-item>
+
+      <q-expansion-item
+        default-opened
+        expand-separator
+        icon="perm_media"
+        label="Somar duas Imagem"
+        header-class="text-primary"
+      >
+        <div class="row justify-around text-center">
+          <div class="col-12 text-overline">
+            Informe a Porcentagem:
+          </div>
+          <div class="col-5">
+            <q-input
+              label="Imagem 1"
+              v-model.number="porcetagemImage1"
+              type="number"
+              outlined
+            />
+          </div>
+          <div class="col-5">
+            <q-input
+              label="Imagem 2"
+              v-model.number="porcetagemImage2"
+              type="number"
+              outlined
+            />
+          </div>
+          <div class="col-12 q-pa-sm">
+            <q-btn
+              flat
+              label="Upload 2 Imagem"
+              color="primary"
+              @click="upload2Imagem"
+            ></q-btn>
+            <q-btn
+              class="q-ma-sm"
+              round
+              color="primary"
+              icon="done"
+              @click="somaImagem"
+            />
+
+            <input
+              ref="file"
+              class="hidden"
+              type="file"
+              multiple="multiple"
+              accept="image/*"
+              @change="onFileChanged"
+            />
+          </div>
+        </div>
+        <q-separator />
       </q-expansion-item>
     </q-drawer>
 
@@ -152,7 +205,11 @@ export default {
   },
   data() {
     return {
-      leftDrawerOpen: false
+      leftDrawerOpen: false,
+      ImageData1: "",
+      ImageData2: "",
+      porcetagemImage1: 100,
+      porcetagemImage2: 100
     };
   },
   computed: {
@@ -170,6 +227,65 @@ export default {
     }
   },
   methods: {
+    somaImagem() {
+      this.resertImagem().then(result => {
+        let ImageData = this.getImageData();
+        let red, blue, green, alpha;
+        for (let i = 0; i < ImageData.data.length; i += 4) {
+          red =
+            (ImageData.data[i] * (this.porcetagemImage1 / 100) +
+              this.ImageData2.data[i] * (this.porcetagemImage1 / 100)) /
+            2;
+          green =
+            (ImageData.data[i + 1] * (this.porcetagemImage1 / 100) +
+              this.ImageData2.data[i + 1] * (this.porcetagemImage1 / 100)) /
+            2;
+
+          blue =
+            (ImageData.data[i + 2] * (this.porcetagemImage1 / 100) +
+              this.ImageData2.data[i + 2] * (this.porcetagemImage1 / 100)) /
+            2;
+
+          ImageData.data[i] = red;
+          ImageData.data[i + 1] = green;
+          ImageData.data[i + 2] = blue;
+          ImageData.data[i + 3] = 255;
+        }
+        this.putImageData(ImageData);
+      });
+    },
+    onFileChanged(event) {
+      this.ImageData1 = this.getImageData();
+
+      let file = event.target.files[0];
+      let reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onloadend = () => {
+        let img = new Image();
+        img.src = reader.result;
+
+        this.context.clearRect(0, 0, this.largura, this.altura);
+
+        img.onload = async () => {
+          await this.context.drawImage(img, 0, 0, img.width, img.height);
+          this.ImageData2 = this.getImageData();
+
+          await this.$store.dispatch("canvas/setCanvasTamanho", {
+            width: this.largura * 2 + 10,
+            height: this.altura
+          });
+
+          this.context.putImageData(this.ImageData1, 0, 0);
+          this.context.putImageData(this.ImageData2, this.largura / 2 + 10, 0);
+        };
+      };
+    },
+    upload2Imagem() {
+      this.resertImagem().then(result => {
+        this.$refs.file.value = null;
+        this.$refs.file.click();
+      });
+    },
     BIR() {
       let ImageDataOriginal = this.getImageData();
 
