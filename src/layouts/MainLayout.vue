@@ -137,6 +137,38 @@
       <q-expansion-item
         default-opened
         expand-separator
+        icon="remove"
+        label="Redução da Quantização"
+        header-class="text-primary"
+      >
+        <div class="row justify-around text-center">
+          <div class="col-12 text-overline">
+            Informe o novo nivel de pixel:
+          </div>
+          <div class="col-8">
+            <q-input
+              class="q-pa-sm q-ma-sm"
+              label="Nivel de Cinza"
+              v-model.number="novoNivelCinza"
+              type="number"
+              outlined
+            />
+          </div>
+          <div class="col-3 q-mt-sm">
+            <q-btn
+              class="q-ma-sm"
+              round
+              color="primary"
+              icon="done"
+              @click="novoQuantizacao"
+            />
+          </div>
+        </div>
+        <q-separator />
+      </q-expansion-item>
+
+      <q-expansion-item
+        expand-separator
         icon="perm_media"
         label="Somar duas Imagem"
         header-class="text-primary"
@@ -197,6 +229,7 @@
 </template>
 
 <script>
+import Chart from "chart.js";
 import UploadArquivo from "../components/UploadArquivo.vue";
 export default {
   name: "MainLayout",
@@ -209,7 +242,8 @@ export default {
       ImageData1: "",
       ImageData2: "",
       porcetagemImage1: 50,
-      porcetagemImage2: 50
+      porcetagemImage2: 50,
+      novoNivelCinza: 255
     };
   },
   watch: {
@@ -235,6 +269,75 @@ export default {
     }
   },
   methods: {
+    novoQuantizacao() {
+      this.resertImagem().then(response => {
+        let ImageData = this.getImageData();
+        let variacao = 256 / this.novoNivelCinza;
+        // console.log("variacao", variacao);
+        let red = 0,
+          green = 0,
+          blue = 0,
+          condicao = true;
+        for (let i = 0; i < ImageData.data.length; i += 4) {
+          red = green = blue = variacao * 2;
+          // red
+          condicao = true;
+          while (condicao) {
+            if (ImageData.data[i] < variacao) {
+              red = 0;
+              condicao = false;
+            } else if (ImageData.data[i] > 255 - variacao) {
+              red = 255;
+              condicao = false;
+            } else if (ImageData.data[i] < red) {
+              red -= variacao / 2;
+              condicao = false;
+            } else {
+              red += variacao;
+            }
+          }
+          // green
+          condicao = true;
+          while (condicao) {
+            if (ImageData.data[i + 1] < variacao) {
+              green = 0;
+              condicao = false;
+            } else if (ImageData.data[i + 1] > 255 - variacao) {
+              green = 255;
+              condicao = false;
+            } else if (ImageData.data[i + 1] < green) {
+              green -= variacao / 2;
+              condicao = false;
+            } else {
+              green += variacao;
+            }
+          }
+          // blue
+          condicao = true;
+          while (condicao) {
+            if (ImageData.data[i + 2] < variacao) {
+              blue = 0;
+              condicao = false;
+            } else if (ImageData.data[i + 2] > 255 - variacao) {
+              blue = 255;
+              condicao = false;
+            } else if (ImageData.data[i + 2] < blue) {
+              blue -= variacao / 2;
+              condicao = false;
+            } else {
+              blue += variacao;
+            }
+          }
+
+          ImageData.data[i] = red;
+          ImageData.data[i + 1] = green;
+          ImageData.data[i + 2] = blue;
+          ImageData.data[i + 3] = 255;
+        }
+        // console.log(ImageData);
+        this.putImageData(ImageData);
+      });
+    },
     somaImagem() {
       this.resertImagem().then(result => {
         let ImageData = this.getImageData();
