@@ -215,14 +215,29 @@
         <q-separator />
       </q-expansion-item>
 
-      <q-list bordered separator class="text-primary">
-        <q-item clickable v-ripple @click="histograma">
-          <q-item-section avatar>
-            <q-icon name="bar_chart" />
-          </q-item-section>
-          <q-item-section>Histograma</q-item-section>
-        </q-item>
-      </q-list>
+      <q-expansion-item
+        icon="bar_chart"
+        label="Histograma"
+        header-class="text-primary"
+      >
+        <q-list>
+          <q-item clickable v-ripple @click="histogramaNormal">
+            <q-item-section>
+              <q-item-label>Histograma</q-item-label>
+              <q-item-label caption>Histograma da imagem normal</q-item-label>
+            </q-item-section>
+          </q-item>
+
+          <q-item clickable v-ripple @click="histogramaEqualizado">
+            <q-item-section>
+              <q-item-label>Equalizar</q-item-label>
+              <q-item-label caption
+                >Histograma da imagem equalizada</q-item-label
+              >
+            </q-item-section>
+          </q-item>
+        </q-list>
+      </q-expansion-item>
     </q-drawer>
 
     <q-page-container>
@@ -282,7 +297,7 @@ export default {
     }
   },
   methods: {
-    histograma() {
+    histogramaNormal() {
       this.resertImagem().then(async Response => {
         let dataRed = new Array(255);
         let dataGreen = new Array(255);
@@ -338,8 +353,6 @@ export default {
           },
           options: {}
         });
-
-        // this.putImageData(ImageData);
       });
     },
     novoQuantizacao() {
