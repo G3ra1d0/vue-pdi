@@ -407,20 +407,14 @@ export default {
         // console.log("Novo nivel de cinza", novoNivelCinzaRed);
 
         // console.log(ImageData);
+        console.log(ImageData.data[3]);
+        console.log(novoNivelCinzaRed[255]);
         for (let i = 0; i < ImageData.data.length; i += 4) {
-          for (let j = 0; j < 256; j++) {
-            if (ImageData.data[i] == j) {
-              ImageData.data[i] = novoNivelCinzaRed[j];
-            }
-            if (ImageData.data[i + 1] == j) {
-              ImageData.data[i + 1] = novoNivelCinzaGreen[j];
-            }
-            if (ImageData.data[i + 2] == j) {
-              ImageData.data[i + 2] = novoNivelCinzaBlue[j];
-            }
-          }
+          ImageData.data[i] = novoNivelCinzaRed[ImageData.data[i]];
+          ImageData.data[i + 1] = novoNivelCinzaGreen[ImageData.data[i + 1]];
+          ImageData.data[i + 2] = novoNivelCinzaBlue[ImageData.data[i + 2]];
         }
-        // console.log(ImageData);
+        console.log(ImageData);
 
         this.putImageData(ImageData);
       });
