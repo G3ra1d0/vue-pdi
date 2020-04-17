@@ -25,63 +25,58 @@
       bordered
       content-class="bg-grey-1"
     >
-      <q-list>
-        <q-expansion-item
-          group="somegroup"
-          icon="photo_filter"
-          label="Filtros"
-          header-class="text-primary"
-        >
-          <q-list>
-            <q-item clickable v-ripple @click="filtroNegativo">
-              <q-item-section>
-                <q-item-label>Negativo</q-item-label>
-                <q-item-label caption
-                  >Aplica Filtro negativo na imagem</q-item-label
-                >
-              </q-item-section>
-            </q-item>
+      <q-expansion-item
+        group="somegroup"
+        icon="photo_filter"
+        label="Filtros"
+        header-class="text-primary"
+      >
+        <q-list>
+          <q-item clickable v-ripple @click="filtroNegativo">
+            <q-item-section>
+              <q-item-label>Negativo</q-item-label>
+              <q-item-label caption
+                >Aplica Filtro negativo na imagem</q-item-label
+              >
+            </q-item-section>
+          </q-item>
 
-            <q-item clickable v-ripple @click="filtroLog">
-              <q-item-section>
-                <q-item-label>Logaritmo</q-item-label>
-                <q-item-label caption
-                  >Aplica Filtro Logaritmo na imagem</q-item-label
-                >
-              </q-item-section>
-            </q-item>
+          <q-item clickable v-ripple @click="filtroLog">
+            <q-item-section>
+              <q-item-label>Logaritmo</q-item-label>
+              <q-item-label caption
+                >Aplica Filtro Logaritmo na imagem</q-item-label
+              >
+            </q-item-section>
+          </q-item>
 
-            <q-item clickable v-ripple @click="filtroLogInverso">
-              <q-item-section>
-                <q-item-label>Logaritmo Inverso</q-item-label>
-                <q-item-label caption
-                  >Aplica Filtro Logaritmo Inverso na imagem</q-item-label
-                >
-              </q-item-section>
-            </q-item>
+          <q-item clickable v-ripple @click="filtroLogInverso">
+            <q-item-section>
+              <q-item-label>Logaritmo Inverso</q-item-label>
+              <q-item-label caption
+                >Aplica Filtro Logaritmo Inverso na imagem</q-item-label
+              >
+            </q-item-section>
+          </q-item>
 
-            <q-separator />
+          <q-separator />
 
-            <q-item clickable v-ripple @click="filtroPotencia">
-              <q-item-section>
-                <q-item-label>Potencia</q-item-label>
-                <q-item-label caption
-                  >Aplica Filtro Potencia na imagem</q-item-label
-                >
-              </q-item-section>
-            </q-item>
-            <q-item clickable v-ripple @click="filtroRaiz">
-              <q-item-section>
-                <q-item-label>Raiz</q-item-label>
-                <q-item-label caption
-                  >Aplica Filtro Raiz na imagem</q-item-label
-                >
-              </q-item-section>
-            </q-item>
-          </q-list>
-        </q-expansion-item>
-        <q-separator />
-      </q-list>
+          <q-item clickable v-ripple @click="filtroPotencia">
+            <q-item-section>
+              <q-item-label>Potencia</q-item-label>
+              <q-item-label caption
+                >Aplica Filtro Potencia na imagem</q-item-label
+              >
+            </q-item-section>
+          </q-item>
+          <q-item clickable v-ripple @click="filtroRaiz">
+            <q-item-section>
+              <q-item-label>Raiz</q-item-label>
+              <q-item-label caption>Aplica Filtro Raiz na imagem</q-item-label>
+            </q-item-section>
+          </q-item>
+        </q-list>
+      </q-expansion-item>
 
       <q-expansion-item
         expand-separator
@@ -135,7 +130,6 @@
       </q-expansion-item>
 
       <q-expansion-item
-        default-opened
         expand-separator
         icon="remove"
         label="Redução da Quantização"
@@ -220,6 +214,15 @@
         </div>
         <q-separator />
       </q-expansion-item>
+
+      <q-list bordered separator class="text-primary">
+        <q-item clickable v-ripple @click="histograma">
+          <q-item-section avatar>
+            <q-icon name="bar_chart" />
+          </q-item-section>
+          <q-item-section>Histograma</q-item-section>
+        </q-item>
+      </q-list>
     </q-drawer>
 
     <q-page-container>
@@ -243,10 +246,17 @@ export default {
       ImageData2: "",
       porcetagemImage1: 50,
       porcetagemImage2: 50,
-      novoNivelCinza: 255
+      novoNivelCinza: 255,
+      dataChart: null
     };
   },
   watch: {
+    base64() {
+      if (this.dataChart != null) {
+        this.dataChart.destroy();
+        this.dataChart = null;
+      }
+    },
     porcetagemImage1() {
       this.porcetagemImage2 = 100 - this.porcetagemImage1;
     },
@@ -266,9 +276,72 @@ export default {
     },
     altura() {
       return this.$store.getters["canvas/getAltura"];
+    },
+    canvas() {
+      return this.$store.getters["canvas/getCanvas"];
     }
   },
   methods: {
+    histograma() {
+      this.resertImagem().then(async Response => {
+        let dataRed = new Array(255);
+        let dataGreen = new Array(255);
+        let dataBlue = new Array(255);
+        let labels = new Array(255);
+        let colorRed = new Array(255);
+        let colorGreen = new Array(255);
+        let colorBlue = new Array(255);
+        for (let i = 0; i < 255; i++) {
+          dataRed[i] = 0;
+          dataGreen[i] = 0;
+          dataBlue[i] = 0;
+          labels[i] = i;
+          colorRed[i] = "rgba(255, 0, 0, 1)";
+          colorGreen[i] = "rgba(0, 255, 0, 1)";
+          colorBlue[i] = "rgba(0, 0, 255, 1)";
+        }
+
+        let ImageData = this.getImageData();
+        for (let i = 0; i < ImageData.data.length; i += 4) {
+          dataRed[ImageData.data[i]]++;
+          dataGreen[ImageData.data[i + 1]]++;
+          dataBlue[ImageData.data[i + 2]]++;
+        }
+
+        this.dataChart = new Chart(this.context, {
+          type: "bar",
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: "RED",
+                data: dataRed,
+                backgroundColor: colorRed,
+                borderColor: colorRed,
+                borderWidth: 1
+              },
+              {
+                label: "Green",
+                data: dataGreen,
+                backgroundColor: colorGreen,
+                borderColor: colorGreen,
+                borderWidth: 1
+              },
+              {
+                label: "Blue",
+                data: dataBlue,
+                backgroundColor: colorBlue,
+                borderColor: colorBlue,
+                borderWidth: 1
+              }
+            ]
+          },
+          options: {}
+        });
+
+        // this.putImageData(ImageData);
+      });
+    },
     novoQuantizacao() {
       this.resertImagem().then(response => {
         let ImageData = this.getImageData();
@@ -524,6 +597,10 @@ export default {
       });
     },
     limpar() {
+      if (this.dataChart != null) {
+        this.dataChart.destroy();
+        this.dataChart = null;
+      }
       this.context.clearRect(0, 0, this.largura, this.altura);
     },
     async resertImagem() {

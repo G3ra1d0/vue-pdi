@@ -26,18 +26,16 @@ export default {
   },
   watch: {
     base64() {
+      this.limpar();
       let img = new Image();
       img.src = this.base64;
 
-      img.onload = () => {
-        this.$store.dispatch("canvas/setCanvasTamanho", {
+      img.onload = async () => {
+        await this.$store.dispatch("canvas/setCanvasTamanho", {
           width: img.width,
           height: img.height
         });
-
-        setTimeout(() => {
-          this.context.drawImage(img, 0, 0, this.largura, this.altura);
-        }, 100);
+        this.context.drawImage(img, 0, 0, this.largura, this.altura);
       };
     }
   },
