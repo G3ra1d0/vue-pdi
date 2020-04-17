@@ -1,6 +1,6 @@
 <template>
   <div>
-    <q-btn flat dense round icon="add" @click="onUpload" />
+    <q-btn flat dense  icon="add" @click="onUpload" label="Upload da Imagem"/>
     <input
       ref="file"
       class="hidden"
