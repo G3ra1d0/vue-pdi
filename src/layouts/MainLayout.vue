@@ -223,19 +223,31 @@
         <q-list>
           <q-item clickable v-ripple @click="histogramaNormal">
             <q-item-section>
-              <q-item-label>Histograma</q-item-label>
+              <q-item-label class="text-primary">Histograma</q-item-label>
               <q-item-label caption>Histograma da imagem normal</q-item-label>
             </q-item-section>
           </q-item>
-
-          <q-item clickable v-ripple @click="histogramaEqualizado">
-            <q-item-section>
-              <q-item-label>Equalizar</q-item-label>
-              <q-item-label caption
-                >Histograma da imagem equalizada</q-item-label
-              >
-            </q-item-section>
-          </q-item>
+          <q-expansion-item
+            expand-separator
+            label="Equalizar Imagem"
+            caption="Mostra nova imagem ou novo histograma ja equalizado"
+            header-class="text-primary"
+          >
+            <div class="row justify-center q-pa-sm">
+              <q-btn
+                flat
+                color="primary"
+                label="Histograma"
+                @click="histogramaEqualizado"
+              />
+              <q-btn
+                flat
+                color="primary"
+                label="Imagem"
+                @click="imagemEqualizado"
+              />
+            </div>
+          </q-expansion-item>
         </q-list>
       </q-expansion-item>
     </q-drawer>
@@ -297,6 +309,122 @@ export default {
     }
   },
   methods: {
+    imagemEqualizado() {
+      this.resertImagem().then(async Response => {
+        let dataRed = new Array(255);
+        let dataGreen = new Array(255);
+        let dataBlue = new Array(255);
+        let labels = new Array(255);
+        let colorRed = new Array(255);
+        let colorGreen = new Array(255);
+        let colorBlue = new Array(255);
+        let equalizadoRed = new Array(255);
+        let equalizadoGreen = new Array(255);
+        let equalizadoBlue = new Array(255);
+        let novoCinzaRed = new Array(255);
+        let novoCinzaGreen = new Array(255);
+        let novoCinzaBlue = new Array(255);
+
+        // inicializando variavel
+        for (let i = 0; i < 256; i++) {
+          equalizadoRed[i] = 0;
+          equalizadoGreen[i] = 0;
+          equalizadoBlue[i] = 0;
+          dataRed[i] = 0;
+          dataGreen[i] = 0;
+          dataBlue[i] = 0;
+          labels[i] = i;
+          colorRed[i] = "rgba(255, 0, 0, 1)";
+          colorGreen[i] = "rgba(0, 255, 0, 1)";
+          colorBlue[i] = "rgba(0, 0, 255, 1)";
+        }
+
+        let ImageData = this.getImageData();
+        let toalPixel = 0;
+        for (let i = 0; i < ImageData.data.length; i += 4) {
+          dataRed[ImageData.data[i]]++;
+          dataGreen[ImageData.data[i + 1]]++;
+          dataBlue[ImageData.data[i + 2]]++;
+          toalPixel++;
+        }
+
+        // quantidade de pixel por nivel
+        // console.log("Quantidade de pixel por nivel", dataRed);
+
+        // probabilidade do pixel
+        let valorNivelCinzaRed = new Array(255);
+        let valorNivelCinzaGreen = new Array(255);
+        let valorNivelCinzaBlue = new Array(255);
+        let pobabilidadePixelRed = new Array(255);
+        let pobabilidadePixelGreen = new Array(255);
+        let pobabilidadePixelBlue = new Array(255);
+        for (let i = 0; i <= 255; i++) {
+          valorNivelCinzaRed[i] = i / 255;
+          valorNivelCinzaGreen[i] = i / 255;
+          valorNivelCinzaBlue[i] = i / 255;
+          pobabilidadePixelRed[i] = dataRed[i] / toalPixel;
+          pobabilidadePixelGreen[i] = dataGreen[i] / toalPixel;
+          pobabilidadePixelBlue[i] = dataBlue[i] / toalPixel;
+        }
+        // console.log("Pobabilidade do pixel", pobabilidadePixel);
+        // console.log("Valor do nivel de cinza", valorNivelCinza);
+
+        //  acumulado = cdf
+        let acumuladoRed = new Array(255);
+        let acumuladoGreen = new Array(255);
+        let acumuladoBlue = new Array(255);
+        for (let i = 0; i <= 255; i++) {
+          if (i == 0) {
+            acumuladoRed[i] = pobabilidadePixelRed[i];
+            acumuladoGreen[i] = pobabilidadePixelGreen[i];
+            acumuladoBlue[i] = pobabilidadePixelBlue[i];
+          } else {
+            acumuladoRed[i] = pobabilidadePixelRed[i] + acumuladoRed[i - 1];
+            acumuladoGreen[i] =
+              pobabilidadePixelGreen[i] + acumuladoGreen[i - 1];
+            acumuladoBlue[i] = pobabilidadePixelBlue[i] + acumuladoBlue[i - 1];
+          }
+        }
+        // console.log("acumulado da probabilidade", acumulado);
+
+        // novo nivel de cinza
+        let novoNivelCinzaRed = new Array(255);
+        let novoNivelCinzaGreen = new Array(255);
+        let novoNivelCinzaBlue = new Array(255);
+        for (let i = 0; i <= 255; i++) {
+          for (let j = 0; j <= 255; j++) {
+            if (acumuladoRed[i] >= valorNivelCinzaRed[j]) {
+              novoNivelCinzaRed[i] = j;
+            }
+            if (acumuladoGreen[i] >= valorNivelCinzaGreen[j]) {
+              novoNivelCinzaGreen[i] = j;
+            }
+            if (acumuladoBlue[i] >= valorNivelCinzaBlue[j]) {
+              novoNivelCinzaBlue[i] = j;
+            }
+          }
+        }
+        // console.log("Novo nivel de cinza", novoNivelCinzaRed);
+
+        // console.log(ImageData);
+        for (let i = 0; i < ImageData.data.length; i += 4) {
+          for (let j = 0; j < 256; j++) {
+            if (ImageData.data[i] == j) {
+              ImageData.data[i] = novoNivelCinzaRed[j];
+            }
+            if (ImageData.data[i + 1] == j) {
+              ImageData.data[i + 1] = novoNivelCinzaGreen[j];
+            }
+            if (ImageData.data[i + 2] == j) {
+              ImageData.data[i + 2] = novoNivelCinzaBlue[j];
+            }
+          }
+        }
+        // console.log(ImageData);
+
+        this.putImageData(ImageData);
+      });
+    },
     histogramaEqualizado() {
       this.resertImagem().then(async Response => {
         let dataRed = new Array(255);
