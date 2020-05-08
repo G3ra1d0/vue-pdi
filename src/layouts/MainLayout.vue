@@ -250,6 +250,22 @@
           </q-expansion-item>
         </q-list>
       </q-expansion-item>
+
+      <q-expansion-item
+        icon="autorenew"
+        label="Manipulando Imagem"
+        header-class="text-primary"
+      >
+        <q-list>
+          <q-item clickable v-ripple @click="espelhamentoHorizontal">
+            <q-item-section>
+              <q-item-label class="text-primary"
+                >Espelhamento Horizontal</q-item-label
+              >
+            </q-item-section>
+          </q-item>
+        </q-list>
+      </q-expansion-item>
     </q-drawer>
 
     <q-page-container>
@@ -309,6 +325,25 @@ export default {
     }
   },
   methods: {
+    espelhamentoHorizontal() {
+      this.resertImagem().then(result => {
+        let ImageData = this.getImageData();
+        let pixel,
+          posicao = 0;
+        for (let y = 0; y < this.altura; y++) {
+          for (let x = 0; x < this.largura; x++) {
+            pixel = this.context.getImageData(this.largura - x, y, 1, 1).data;
+            // console.log(x, ",", y, ":", pixel);
+            ImageData.data[posicao] = pixel[0];
+            ImageData.data[posicao + 1] = pixel[1];
+            ImageData.data[posicao + 2] = pixel[2];
+            ImageData.data[posicao + 3] = pixel[3];
+            posicao += 4;
+          }
+        }
+        this.putImageData(ImageData);
+      });
+    },
     imagemEqualizado() {
       this.resertImagem().then(async Response => {
         let dataRed = new Array(255);
@@ -407,14 +442,14 @@ export default {
         // console.log("Novo nivel de cinza", novoNivelCinzaRed);
 
         // console.log(ImageData);
-        console.log(ImageData.data[3]);
-        console.log(novoNivelCinzaRed[255]);
+        // console.log(ImageData.data[3]);
+        // console.log(novoNivelCinzaRed[255]);
         for (let i = 0; i < ImageData.data.length; i += 4) {
           ImageData.data[i] = novoNivelCinzaRed[ImageData.data[i]];
           ImageData.data[i + 1] = novoNivelCinzaGreen[ImageData.data[i + 1]];
           ImageData.data[i + 2] = novoNivelCinzaBlue[ImageData.data[i + 2]];
         }
-        console.log(ImageData);
+        // console.log(ImageData);
 
         this.putImageData(ImageData);
       });
