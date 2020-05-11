@@ -278,6 +278,13 @@
               >
             </q-item-section>
           </q-item>
+          <q-item clickable v-ripple @click="rotacao90AntiHorario">
+            <q-item-section>
+              <q-item-label class="text-primary"
+                >Rotação 90° sentido anti-horario</q-item-label
+              >
+            </q-item-section>
+          </q-item>
         </q-list>
       </q-expansion-item>
     </q-drawer>
@@ -339,6 +346,25 @@ export default {
     }
   },
   methods: {
+    rotacao90AntiHorario() {
+      this.resertImagem().then(result => {
+        let ImageData = this.getImageData();
+        let pixel,
+          posicao = 0;
+        for (let y = 0; y < this.altura; y++) {
+          for (let x = 0; x < this.largura; x++) {
+            pixel = this.context.getImageData(this.altura - y, x, 1, 1).data;
+            // console.log(x, ",", y, ":", pixel);
+            ImageData.data[posicao] = pixel[0];
+            ImageData.data[posicao + 1] = pixel[1];
+            ImageData.data[posicao + 2] = pixel[2];
+            ImageData.data[posicao + 3] = pixel[3];
+            posicao += 4;
+          }
+        }
+        this.putImageData(ImageData);
+      });
+    },
     rotacao90Horario() {
       this.resertImagem().then(result => {
         let ImageData = this.getImageData();
