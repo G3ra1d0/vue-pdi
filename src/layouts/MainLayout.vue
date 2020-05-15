@@ -301,6 +301,11 @@
               <q-item-label class="text-primary">Prewitt</q-item-label>
             </q-item-section>
           </q-item>
+          <q-item clickable v-ripple @click="Sobel">
+            <q-item-section>
+              <q-item-label class="text-primary">Sobel</q-item-label>
+            </q-item-section>
+          </q-item>
         </q-list>
       </q-expansion-item>
     </q-drawer>
@@ -362,6 +367,151 @@ export default {
     }
   },
   methods: {
+    Sobel() {
+      this.resertImagem().then(Response => {
+        let ImageData = this.getImageData();
+        let pixel,
+          posicao = 0,
+          primeiralinha,
+          segundalinha,
+          primeiracoluna,
+          segundacoluna,
+          red,
+          green,
+          blue,
+          temp;
+        for (let y = 0; y < this.altura; y++) {
+          for (let x = 0; x < this.largura; x++) {
+            if (
+              x == 0 ||
+              y == 0 ||
+              y == this.altura - 1 ||
+              x == this.largura - 1
+            ) {
+              pixel = this.context.getImageData(
+                this.largura - x,
+                this.altura - y,
+                1,
+                1
+              ).data;
+
+              ImageData.data[posicao] = pixel[0];
+              ImageData.data[posicao + 1] = pixel[1];
+              ImageData.data[posicao + 2] = pixel[2];
+              ImageData.data[posicao + 3] = pixel[3];
+            } else {
+              primeiralinha = this.context.getImageData(x - 1, y - 1, 3, 1)
+                .data;
+              segundalinha = this.context.getImageData(x - 1, y + 1, 3, 1).data;
+
+              primeiracoluna = this.context.getImageData(x - 1, y - 1, 1, 3)
+                .data;
+              segundacoluna = this.context.getImageData(x + 1, y - 1, 1, 3)
+                .data;
+
+              red = 0;
+              green = 0;
+              blue = 0;
+
+              let primeiralinhaRed = 0,
+                primeiralinhaGreen = 0,
+                primeiralinhaBlue = 0,
+                segundalinhaRed = 0,
+                segundalinhaGreen = 0,
+                segundalinhaBlue = 0,
+                primeiracolunaRed = 0,
+                primeiracolunaGreen = 0,
+                primeiracolunaBlue = 0,
+                segundacolunaRed = 0,
+                segundacolunaGreen = 0,
+                segundacolunaBlue = 0;
+
+              for (temp = 0; temp < 12; temp += 4) {
+                primeiralinhaRed +=
+                  temp > 3 && temp < 8
+                    ? 2 * primeiralinha[temp]
+                    : primeiralinha[temp];
+                primeiralinhaGreen +=
+                  temp > 3 && temp < 8
+                    ? 2 * primeiralinha[temp + 1]
+                    : primeiralinha[temp + 1];
+                primeiralinhaBlue +=
+                  temp > 3 && temp < 8
+                    ? 2 * primeiralinha[temp + 2]
+                    : primeiralinha[temp + 2];
+
+                segundalinhaRed +=
+                  temp > 3 && temp < 8
+                    ? 2 * segundalinha[temp]
+                    : segundalinha[temp];
+                segundalinhaGreen +=
+                  temp > 3 && temp < 8
+                    ? 2 * segundalinha[temp + 1]
+                    : segundalinha[temp + 1];
+                segundalinhaBlue +=
+                  temp > 3 && temp < 8
+                    ? 2 * segundalinha[temp + 2]
+                    : segundalinha[temp + 2];
+
+                primeiracolunaRed +=
+                  temp > 3 && temp < 8
+                    ? 2 * primeiracoluna[temp]
+                    : primeiracoluna[temp];
+                primeiracolunaGreen +=
+                  temp > 3 && temp < 8
+                    ? 2 * primeiracoluna[temp + 1]
+                    : primeiracoluna[temp + 1];
+                primeiracolunaBlue +=
+                  temp > 3 && temp < 8
+                    ? 2 * primeiracoluna[temp + 2]
+                    : primeiracoluna[temp + 2];
+
+                segundacolunaRed +=
+                  temp > 3 && temp < 8
+                    ? 2 * segundacoluna[temp]
+                    : segundacoluna[temp];
+                segundacolunaGreen +=
+                  temp > 3 && temp < 8
+                    ? 2 * segundacoluna[temp + 1]
+                    : segundacoluna[temp + 1];
+                segundacolunaBlue +=
+                  temp > 3 && temp < 8
+                    ? 2 * segundacoluna[temp + 2]
+                    : segundacoluna[temp + 2];
+              }
+
+              ImageData.data[posicao] =
+                (segundalinhaRed - primeiralinhaRed < 0
+                  ? (segundalinhaRed - primeiralinhaRed) * -1
+                  : segundalinhaRed - primeiralinhaRed) +
+                (segundacolunaRed - primeiracolunaRed < 0
+                  ? (segundacolunaRed - primeiracolunaRed) * -1
+                  : segundacolunaRed - primeiracolunaRed);
+
+              ImageData.data[posicao + 1] =
+                (segundalinhaGreen - primeiralinhaGreen < 0
+                  ? (segundalinhaGreen - primeiralinhaGreen) * -1
+                  : segundalinhaGreen - primeiralinhaGreen) +
+                (segundacolunaGreen - primeiracolunaGreen < 0
+                  ? (segundacolunaGreen - primeiracolunaGreen) * -1
+                  : segundacolunaGreen - primeiracolunaGreen);
+
+              ImageData.data[posicao + 2] =
+                (segundalinhaBlue - primeiralinhaBlue < 0
+                  ? (segundalinhaBlue - primeiralinhaBlue) * -1
+                  : segundalinhaBlue - primeiralinhaBlue) +
+                (segundacolunaBlue - primeiracolunaBlue < 0
+                  ? (segundacolunaBlue - primeiracolunaBlue) * -1
+                  : segundacolunaBlue - primeiracolunaBlue);
+
+              ImageData.data[posicao + 3] = 255;
+            }
+            posicao += 4;
+          }
+        }
+        this.putImageData(ImageData);
+      });
+    },
     Prewitt() {
       this.resertImagem().then(Response => {
         let ImageData = this.getImageData();
@@ -462,6 +612,8 @@ export default {
                 (segundacolunaBlue - primeiracolunaBlue < 0
                   ? (segundacolunaBlue - primeiracolunaBlue) * -1
                   : segundacolunaBlue - primeiracolunaBlue);
+
+              ImageData.data[posicao + 3] = 255;
             }
             posicao += 4;
           }
