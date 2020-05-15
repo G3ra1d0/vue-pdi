@@ -376,9 +376,18 @@ export default {
           segundalinha,
           primeiracoluna,
           segundacoluna,
-          red,
-          green,
-          blue,
+          primeiralinhaRed,
+          primeiralinhaGreen,
+          primeiralinhaBlue,
+          segundalinhaRed,
+          segundalinhaGreen,
+          segundalinhaBlue,
+          primeiracolunaRed,
+          primeiracolunaGreen,
+          primeiracolunaBlue,
+          segundacolunaRed,
+          segundacolunaGreen,
+          segundacolunaBlue,
           temp;
         for (let y = 0; y < this.altura; y++) {
           for (let x = 0; x < this.largura; x++) {
@@ -409,22 +418,18 @@ export default {
               segundacoluna = this.context.getImageData(x + 1, y - 1, 1, 3)
                 .data;
 
-              red = 0;
-              green = 0;
-              blue = 0;
-
-              let primeiralinhaRed = 0,
-                primeiralinhaGreen = 0,
-                primeiralinhaBlue = 0,
-                segundalinhaRed = 0,
-                segundalinhaGreen = 0,
-                segundalinhaBlue = 0,
-                primeiracolunaRed = 0,
-                primeiracolunaGreen = 0,
-                primeiracolunaBlue = 0,
-                segundacolunaRed = 0,
-                segundacolunaGreen = 0,
-                segundacolunaBlue = 0;
+              primeiralinhaRed = 0;
+              primeiralinhaGreen = 0;
+              primeiralinhaBlue = 0;
+              segundalinhaRed = 0;
+              segundalinhaGreen = 0;
+              segundalinhaBlue = 0;
+              primeiracolunaRed = 0;
+              primeiracolunaGreen = 0;
+              primeiracolunaBlue = 0;
+              segundacolunaRed = 0;
+              segundacolunaGreen = 0;
+              segundacolunaBlue = 0;
 
               for (temp = 0; temp < 12; temp += 4) {
                 primeiralinhaRed +=
@@ -521,9 +526,18 @@ export default {
           segundalinha,
           primeiracoluna,
           segundacoluna,
-          red,
-          green,
-          blue,
+          primeiralinhaRed,
+          primeiralinhaGreen,
+          primeiralinhaBlue,
+          segundalinhaRed,
+          segundalinhaGreen,
+          segundalinhaBlue,
+          primeiracolunaRed,
+          primeiracolunaGreen,
+          primeiracolunaBlue,
+          segundacolunaRed,
+          segundacolunaGreen,
+          segundacolunaBlue,
           temp;
         for (let y = 0; y < this.altura; y++) {
           for (let x = 0; x < this.largura; x++) {
@@ -554,22 +568,18 @@ export default {
               segundacoluna = this.context.getImageData(x + 1, y - 1, 1, 3)
                 .data;
 
-              red = 0;
-              green = 0;
-              blue = 0;
-
-              let primeiralinhaRed = 0,
-                primeiralinhaGreen = 0,
-                primeiralinhaBlue = 0,
-                segundalinhaRed = 0,
-                segundalinhaGreen = 0,
-                segundalinhaBlue = 0,
-                primeiracolunaRed = 0,
-                primeiracolunaGreen = 0,
-                primeiracolunaBlue = 0,
-                segundacolunaRed = 0,
-                segundacolunaGreen = 0,
-                segundacolunaBlue = 0;
+              primeiralinhaRed = 0;
+              primeiralinhaGreen = 0;
+              primeiralinhaBlue = 0;
+              segundalinhaRed = 0;
+              segundalinhaGreen = 0;
+              segundalinhaBlue = 0;
+              primeiracolunaRed = 0;
+              primeiracolunaGreen = 0;
+              primeiracolunaBlue = 0;
+              segundacolunaRed = 0;
+              segundacolunaGreen = 0;
+              segundacolunaBlue = 0;
 
               for (temp = 0; temp < 12; temp += 4) {
                 primeiralinhaRed += primeiralinha[temp];
