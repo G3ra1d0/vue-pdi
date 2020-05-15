@@ -375,7 +375,7 @@ export default {
           green,
           blue,
           temp;
-           for (let y = 0; y < this.altura; y++) {
+        for (let y = 0; y < this.altura; y++) {
           for (let x = 0; x < this.largura; x++) {
             if (
               x == 0 ||
@@ -395,7 +395,6 @@ export default {
               ImageData.data[posicao + 2] = pixel[2];
               ImageData.data[posicao + 3] = pixel[3];
             } else {
-
               primeiralinha = this.context.getImageData(x - 1, y - 1, 3, 1)
                 .data;
               segundalinha = this.context.getImageData(x - 1, y + 1, 3, 1).data;
@@ -441,47 +440,33 @@ export default {
               }
 
               ImageData.data[posicao] =
-                (  
-                  (segundalinhaRed - primeiralinhaRed < 0
+                (segundalinhaRed - primeiralinhaRed < 0
                   ? (segundalinhaRed - primeiralinhaRed) * -1
-                  : segundalinhaRed - primeiralinhaRed) 
-                ) +
-                (
-                  (segundacolunaRed - primeiracolunaRed < 0
+                  : segundalinhaRed - primeiralinhaRed) +
+                (segundacolunaRed - primeiracolunaRed < 0
                   ? (segundacolunaRed - primeiracolunaRed) * -1
-                  : segundacolunaRed - primeiracolunaRed)
-                );
+                  : segundacolunaRed - primeiracolunaRed);
 
               ImageData.data[posicao + 1] =
-                (  
-                  (segundalinhaGreen - primeiralinhaGreen < 0
+                (segundalinhaGreen - primeiralinhaGreen < 0
                   ? (segundalinhaGreen - primeiralinhaGreen) * -1
-                  : segundalinhaGreen - primeiralinhaGreen) 
-                ) +
-                (
-                  (segundacolunaGreen - primeiracolunaGreen < 0
+                  : segundalinhaGreen - primeiralinhaGreen) +
+                (segundacolunaGreen - primeiracolunaGreen < 0
                   ? (segundacolunaGreen - primeiracolunaGreen) * -1
-                  : segundacolunaGreen - primeiracolunaGreen)
-                );
+                  : segundacolunaGreen - primeiracolunaGreen);
 
               ImageData.data[posicao + 2] =
-                (  
-                  (segundalinhaBlue - primeiralinhaBlue < 0
+                (segundalinhaBlue - primeiralinhaBlue < 0
                   ? (segundalinhaBlue - primeiralinhaBlue) * -1
-                  : segundalinhaBlue - primeiralinhaBlue) 
-                ) +
-                (
-                  (segundacolunaBlue - primeiracolunaBlue < 0
+                  : segundalinhaBlue - primeiralinhaBlue) +
+                (segundacolunaBlue - primeiracolunaBlue < 0
                   ? (segundacolunaBlue - primeiracolunaBlue) * -1
-                  : segundacolunaBlue - primeiracolunaBlue)
-                );
-
+                  : segundacolunaBlue - primeiracolunaBlue);
             }
             posicao += 4;
           }
         }
         this.putImageData(ImageData);
-
       });
     },
     async mediaBlur() {
