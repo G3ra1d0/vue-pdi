@@ -75,7 +75,41 @@
               <q-item-label caption>Aplica Filtro Raiz na imagem</q-item-label>
             </q-item-section>
           </q-item>
-        </q-list>
+
+         <q-expansion-item
+        expand-separator
+        label="Expansão"
+      >
+        <div class="row justify-around text-center">
+          <div class="col-12">
+            <q-input
+              class="q-pa-sm q-ma-sm"
+              label="Informe A"
+              v-model.number="a"
+              type="number"
+              outlined
+            />
+            <q-input
+              class="q-pa-sm q-ma-sm"
+              label="Informe B"
+              v-model.number="b"
+              type="number"
+              outlined
+            />
+          </div>
+          <div class="col-12 q-mt-sm">
+            <q-btn
+              class="q-ma-sm"
+              color="primary"
+              icon="done"
+              @click="expansao"
+            />
+          </div>
+        </div>
+        <q-separator />
+      </q-expansion-item>
+              </q-list>
+
       </q-expansion-item>
 
       <q-expansion-item
@@ -332,7 +366,9 @@ export default {
       porcetagemImage1: 50,
       porcetagemImage2: 50,
       novoNivelCinza: 255,
-      dataChart: null
+      dataChart: null,
+      b: 2,
+      a: 1.5
     };
   },
   watch: {
@@ -367,6 +403,20 @@ export default {
     }
   },
   methods: {
+    expansao(){
+      this.resertImagem().then(result => {
+        let ImageData = this.getImageData();
+        for (let i = 0; i < ImageData.data.length; i += 4) {
+         
+          ImageData.data[i] =  ImageData.data[i] * this.a + this.b
+          ImageData.data[i + 1] =  ImageData.data[i + 1] * this.a + this.b
+          ImageData.data[i + 2] =  ImageData.data[i + 2] * this.a + this.b
+
+          
+        }
+        this.putImageData(ImageData);
+      });
+    },
     Sobel() {
       this.resertImagem().then(Response => {
         let ImageData = this.getImageData();
