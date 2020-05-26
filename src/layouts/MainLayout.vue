@@ -81,6 +81,12 @@
               <q-item-label caption>Filtro Mediana</q-item-label>
             </q-item-section>
           </q-item>
+          <q-item clickable v-ripple @click="filtroModa">
+            <q-item-section>
+              <q-item-label>Moda</q-item-label>
+              <q-item-label caption>Filtro Moda</q-item-label>
+            </q-item-section>
+          </q-item>
 
          <q-expansion-item
         expand-separator
@@ -441,6 +447,80 @@ export default {
     }
   },
   methods: {
+    moda(array){
+       let moda = array[0], tempmoda
+       let count,tempCount = 0
+       for(let i = 0; i < array.length; i++){
+         tempmoda = array[i]
+         count = 0
+          for(let j = 0; j < array.length; j++){
+            if(tempmoda == array[j]){
+              count++
+            }
+         }
+         if(count > tempCount){
+           moda = array[i]
+           tempCount = count
+         }
+       }
+       return moda
+    },
+    async filtroModa(){
+      await this.resertImagem().then(  result => {
+        let ImageData = this.getImageData();
+        let pixel,
+          posicao = 0,
+          red,
+          green,
+          blue,
+          temp;
+        for (let y = 0; y < this.altura; y++) {
+          for (let x = 0; x < this.largura; x++) {
+            if (
+              x == 0 ||
+              y == 0 ||
+              y == this.altura - 1 ||
+              x == this.largura - 1
+            ) {
+              pixel = this.context.getImageData(
+                this.largura - x,
+                this.altura - y,
+                1,
+                1
+              ).data;
+              ImageData.data[posicao] = pixel[0];
+              ImageData.data[posicao + 1] = pixel[1];
+              ImageData.data[posicao + 2] = pixel[2];
+              ImageData.data[posicao + 3] = pixel[3];
+            } else {
+              pixel = this.context.getImageData(x - 1, y - 1, 3, 3).data;
+
+              red = [];
+              green = [];
+              blue = [];
+
+              for (temp = 0; temp < 36; temp += 4) {
+                red.push( pixel[temp]);
+                green.push( pixel[temp + 1]);
+                blue.push( pixel[temp + 2]);
+              }
+
+               red =    this.moda(red) 
+               green =    this.moda(green)
+               blue =    this.moda(blue)
+               
+
+              ImageData.data[posicao] = red;
+              ImageData.data[posicao + 1] = red;
+              ImageData.data[posicao + 2] = red;
+            }
+
+            posicao += 4;
+          }
+        }
+        this.putImageData(ImageData);
+      });
+    },
     async filtroMediana(){
       await this.resertImagem().then(result => {
         let ImageData = this.getImageData();
